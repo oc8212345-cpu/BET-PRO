@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BetPro — טיפים יומיים</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060608;
+  --surface: #0e0e14;
+  --card: #14141e;
+  --border: #1e1e2e;
+  --border2: #2a2a3f;
+  --accent: #e8c840;
+  --accent2: #ff6b35;
+  --text: #eeeef5;
+  --muted: #5a5a78;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --blue: #3498db;
+  --vip: #f0c040;
+  --vip2: #c8960c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,200,64,0.07) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 40px);
+  pointer-events: none; z-index: 0;
+}
+
+.page { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 16px 40px; }
+
+/* ── TOP BAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.brand-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 26px; font-weight: 700; letter-spacing: 3px;
+  color: var(--accent);
+}
+.brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+.topbar-right { text-align: left; }
+.live-indicator {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--green); letter-spacing: 1px;
+}
+.live-dot {
+  width: 6px; height: 6px; background: var(--green); border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+.update-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ── STATS ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+  margin-bottom: 24px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 12px; text-align: center;
+  transition: border-color .2s, transform .2s;
+}
+.stat:hover { border-color: var(--accent); transform: translateY(-2px); }
+.stat-n {
+  font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+  color: var(--accent); line-height: 1;
+}
+.stat-l { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 0; margin-bottom: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 4px; width: fit-content;
+}
+.tab {
+  padding: 8px 20px; border-radius: 7px; border: none;
+  background: transparent; color: var(--muted);
+  font-family: 'Heebo', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 6px;
+}
+.tab.active { background: var(--card); color: var(--text); }
+.tab-vip.active { background: linear-gradient(135deg, #2a1f00, #1a1200); color: var(--vip); }
+.tab-vip-icon { font-size: 14px; }
+
+/* ── FILTER BAR ── */
+.filterbar {
+  display: flex; gap: 8px; margin-bottom: 16px;
+  flex-wrap: wrap; align-items: center;
+}
+.fbtn {
+  padding: 5px 14px; border-radius: 20px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--muted); font-family: 'Heebo', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all .2s;
+}
+.fbtn:hover, .fbtn.active {
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(232,200,64,.08);
+}
+.search {
+  margin-right: auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px;
+  color: var(--text); font-family: 'Heebo', sans-serif; font-size: 12px;
+  width: 170px; text-align: right;
+}
+.search:focus { outline: none; border-color: var(--accent); }
+.search::placeholder { color: var(--muted); }
+
+/* ── TABLE ── */
+.tbl-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--card); border-bottom: 1px solid var(--border); }
+th {
+  padding: 11px 14px; font-size: 10px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; text-align: right;
+}
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,.03);
+  transition: background .15s;
+  animation: rowIn .35s ease both;
+}
+@keyframes rowIn { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:translateX(0)} }
+tbody tr:hover { background: rgba(232,200,64,.03); }
+tbody tr:last-child { border-bottom: none; }
+td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
+
+.match-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.match-league { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.datetime { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.time-tag {
+  display: inline-block; background: rgba(52,152,219,.15);
+  color: var(--blue); border-radius: 5px; padding: 2px 7px;
+  font-size: 11px; font-weight: 600; margin-top: 3px;
+}
+
+/* Prediction badge */
+.pred {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.pred-1   { background: rgba(46,204,113,.12); color: var(--green); border: 1px solid rgba(46,204,113,.25); }
+.pred-2   { background: rgba(231,76,60,.12);  color: var(--red);   border: 1px solid rgba(231,76,60,.25); }
+.pred-x   { background: rgba(232,200,64,.12); color: var(--accent);border: 1px solid rgba(232,200,64,.25); }
+.pred-o25 { background: rgba(52,152,219,.12); color: var(--blue);  border: 1px solid rgba(52,152,219,.25); }
+.pred-u25 { background: rgba(155,89,182,.12); color: #9b59b6;      border: 1px solid rgba(155,89,182,.25); }
+.pred-def { background: rgba(90,90,120,.12);  color: var(--muted); border: 1px solid rgba(90,90,120,.25); }
+
+/* Confidence */
+.conf-wrap { display: flex; align-items: center; gap: 7px; }
+.conf-bar-bg { flex:1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; min-width: 50px; }
+.conf-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+.conf-pct { font-size: 11px; font-weight: 700; min-width: 32px; text-align: left; }
+
+/* Value */
+.val {
+  display: inline-block; padding: 3px 9px; border-radius: 6px;
+  font-size: 12px; font-weight: 700;
+}
+.val-high { background: rgba(46,204,113,.15); color: var(--green); }
+.val-med  { background: rgba(232,200,64,.15); color: var(--accent); }
+.val-low  { background: rgba(90,90,120,.15);  color: var(--muted); }
+
+/* ── VIP SECTION ── */
+.vip-panel { display: none; }
+.vip-panel.active { display: block; }
+
+.vip-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #1a1200, #0e0c00);
+  border: 1px solid rgba(240,192,64,.2);
+  border-radius: 14px; padding: 20px 24px; margin-bottom: 20px;
+}
+.vip-title {
+  font-family: 'Oswald', sans-serif; font-size: 22px; letter-spacing: 2px;
+  color: var(--vip);
+}
+.vip-sub { font-size: 12px; color: rgba(240,192,64,.5); margin-top: 4px; }
+.vip-crown { font-size: 36px; }
+
+.vip-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; }
+.vip-card {
+  background: var(--card); border: 1px solid rgba(240,192,64,.15);
+  border-radius: 12px; overflow: hidden; position: relative;
+}
+.vip-card-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(240,192,64,.08);
+}
+.vip-match { font-weight: 700; font-size: 14px; }
+.vip-time  { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.vip-body  { padding: 14px 16px; position: relative; }
+
+.vip-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.vip-row:last-child { margin-bottom: 0; }
+.vip-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.vip-val { font-weight: 700; font-size: 14px; }
+.vip-score { color: var(--vip); font-family: 'Oswald', sans-serif; font-size: 20px; letter-spacing: 2px; }
+
+/* Blur overlay */
+.vip-blur {
+  position: absolute; inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(6,6,8,.6);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; border-radius: 0 0 12px 12px;
+}
+.vip-lock { font-size: 28px; }
+.vip-unlock-btn {
+  background: linear-gradient(135deg, var(--vip), var(--vip2));
+  color: #000; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px;
+  font-weight: 700; padding: 8px 20px; border-radius: 8px; border: none; cursor: pointer;
+  transition: opacity .2s;
+}
+.vip-unlock-btn:hover { opacity: .85; }
+.vip-blur-text { font-size: 11px; color: rgba(240,192,64,.6); }
+
+/* Access modal */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.8);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid rgba(240,192,64,.2);
+  border-radius: 16px; padding: 28px; width: 90%; max-width: 380px; text-align: center;
+}
+.modal-crown { font-size: 44px; margin-bottom: 12px; }
+.modal-title {
+  font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--vip);
+  letter-spacing: 2px; margin-bottom: 8px;
+}
+.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.modal-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 11px 14px; color: var(--text);
+  font-family: 'Heebo', sans-serif; font-size: 14px; text-align: center;
+  margin-bottom: 12px;
+}
+.modal-input:focus { outline: none; border-color: var(--vip); }
+.modal-btn {
+  width: 100%; background: linear-gradient(135deg, var(--vip), var(--vip2));
+  color: #000; font-family: 'Oswald', sans-serif; font-size: 16px; letter-spacing: 1px;
+  font-weight: 700; padding: 12px; border-radius: 8px; border: none; cursor: pointer;
+  margin-bottom: 10px; transition: opacity .2s;
+}
+.modal-btn:hover { opacity: .85; }
+.modal-cancel { font-size: 12px; color: var(--muted); cursor: pointer; }
+.modal-cancel:hover { color: var(--text); }
+.modal-err { font-size: 12px; color: var(--red); margin-bottom: 10px; display: none; }
+
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 40px auto; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+@media(max-width:640px){
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .stat-n { font-size: 22px; }
+  th,td { padding: 10px 10px; }
+  .search { width: 120px; }
+  .brand-name { font-size: 20px; }
+  .vip-cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">BETPRO</div>
+        <div class="brand-sub">טיפים יומיים מקצועיים</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-indicator"><span class="live-dot"></span> LIVE</div>
+      <div class="update-time" id="updateTime">מתחבר...</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n" id="sTotal">0</div><div class="stat-l">טיפים היום</div></div>
+    <div class="stat"><div class="stat-n" id="sHome" style="color:var(--green)">0</div><div class="stat-l">ניצחון בית</div></div>
+    <div class="stat"><div class="stat-n" id="sOver" style="color:var(--blue)">0</div><div class="stat-l">Over 2.5</div></div>
+    <div class="stat"><div class="stat-n" id="sValue" style="color:var(--vip)">0</div><div class="stat-l">Value גבוה</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('free',this)">⚽ טיפים חינמיים</button>
+    <button class="tab tab-vip" onclick="switchTab('vip',this)"><span class="tab-vip-icon">👑</span> VIP</button>
+  </div>
+
+  <!-- FREE PANEL -->
+  <div id="freePanel">
+    <div class="filterbar">
+      <button class="fbtn active" onclick="filterBy('all',this)">הכל</button>
+      <button class="fbtn" onclick="filterBy('1',this)">בית</button>
+      <button class="fbtn" onclick="filterBy('2',this)">חוץ</button>
+      <button class="fbtn" onclick="filterBy('x',this)">תיקו</button>
+      <button class="fbtn" onclick="filterBy('over',this)">Over</button>
+      <button class="fbtn" onclick="filterBy('under',this)">Under</button>
+      <input class="search" type="text" placeholder="🔍 חיפוש..." oninput="searchGames(this.value)" />
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>משחק</th>
+            <th>תאריך / שעה</th>
+            <th>תחזית</th>
+            <th>O/U</th>
+            <th>ביטחון</th>
+            <th>ערך</th>
+          </tr>
+        </thead>
+        <tbody id="freeBody">
+          <tr><td colspan="6"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIP PANEL -->
+  <div id="vipPanel" class="vip-panel">
+    <div class="vip-header">
+      <div>
+        <div class="vip-title">👑 VIP ZONE</div>
+        <div class="vip-sub">תוצאות מדויקות • טופס יחס 10+ • טופס יחס 50+</div>
+      </div>
+      <div class="vip-crown">🏆</div>
+    </div>
+    <div class="vip-cards" id="vipCards">
+      <div class="empty">טוען...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- VIP ACCESS MODAL -->
+<div class="modal-bg" id="vipModal">
+  <div class="modal">
+    <div class="modal-crown">👑</div>
+    <div class="modal-title">גישת VIP</div>
+    <div class="modal-sub">הזן את קוד ה-VIP שלך כדי לצפות בתוצאות המדויקות וטופס היחס</div>
+    <input class="modal-input" id="vipCodeInput" type="password" placeholder="הזן קוד גישה..." />
+    <div class="modal-err" id="vipErr">קוד שגוי — נסה שוב</div>
+    <button class="modal-btn" onclick="checkVipCode()">כניסה לVIP</button>
+    <div class="modal-cancel" onclick="closeVipModal()">ביטול</div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwI952WFs9UK_xCXUy6c36P1j-iHk3-l9x0qpFYHyw0GmW5c_f8K7XzxwD0WfBrTSsH/exec';
+const VIP_CODE = 'VIP2026'; // שנה לקוד שתרצה
+
+let allFree = [];
+let allVip  = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let vipUnlocked = sessionStorage.getItem('vipUnlocked') === '1';
+
+// ── LOAD DATA ──
+async function loadData() {
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    allFree = data.filter(r => !r.VIP || r.VIP === '');
+    allVip  = data.filter(r => r.VIP && r.VIP !== '');
+    updateStats();
+    applyFilters();
+    renderVip();
+    const now = new Date();
+    document.getElementById('updateTime').textContent =
+      'עודכן ' + now.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    // Fallback: show demo data
+    allFree = [
+      {MATCH:'ברצלונה - ריאל מדריד', DATE:'31/03', TIME:'21:00', PREDICTION:'1', OVER_UNDER:'Over 2.5', CONFIDENCE:'82', VALUE:'1.95'},
+      {MATCH:'מנצ\'סטר סיטי - ארסנל', DATE:'31/03', TIME:'18:30', PREDICTION:'X', OVER_UNDER:'Under 2.5', CONFIDENCE:'61', VALUE:'3.40'},
+      {MATCH:'פריז - מרסיי', DATE:'01/04', TIME:'20:45', PREDICTION:'1', OVER_UNDER:'Over 2.5', CONFIDENCE:'74', VALUE:'1.75'},
+    ];
+    allVip = [
+      {MATCH:'ליברפול - צ\'לסי', DATE:'31/03', TIME:'17:00', VIP_SCORE:'2-1', VIP_FORM10:'78%', VIP_FORM50:'65%', VIP:'1'},
+    ];
+    updateStats();
+    applyFilters();
+    renderVip();
+    document.getElementById('updateTime').textContent = 'נתוני דמו';
+  }
+}
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('sTotal').textContent = allFree.length;
+  document.getElementById('sHome').textContent = allFree.filter(r => r.PREDICTION === '1' || (r.PREDICTION||'').toLowerCase().includes('home')).length;
+  document.getElementById('sOver').textContent = allFree.filter(r => (r.OVER_UNDER||'').toLowerCase().includes('over')).length;
+  document.getElementById('sValue').textContent = allFree.filter(r => parseFloat(r.VALUE) >= 1.8).length;
+}
+
+// ── PREDICTION ──
+function predClass(p) {
+  const l = (p||'').toLowerCase();
+  if (l === '1' || l.includes('home')) return 'pred-1';
+  if (l === '2' || l.includes('away')) return 'pred-2';
+  if (l === 'x' || l.includes('draw')) return 'pred-x';
+  if (l.includes('over')) return 'pred-o25';
+  if (l.includes('under')) return 'pred-u25';
+  return 'pred-def';
+}
+function predIcon(p) {
+  const l = (p||'').toLowerCase();
+  if (l === '1' || l.includes('home')) return '🏠';
+  if (l === '2' || l.includes('away')) return '✈️';
+  if (l === 'x' || l.includes('draw')) return '⚖️';
+  if (l.includes('over')) return '📈';
+  if (l.includes('under')) return '📉';
+  return '🎯';
+}
+function ouClass(ou) {
+  const l = (ou||'').toLowerCase();
+  if (l.includes('over')) return 'pred-o25';
+  if (l.includes('under')) return 'pred-u25';
+  return 'pred-def';
+}
+
+// ── CONF ──
+function confPct(c) { const n=parseFloat(c); return isNaN(n)?0:Math.min(n>1?n:n*100,100); }
+function confColor(c) { const p=confPct(c); return p>=75?'#2ecc71':p>=50?'#e8c840':'#e74c3c'; }
+
+// ── VALUE ──
+function valClass(v) { const n=parseFloat(v); return isNaN(n)?'val-low':n>=1.8?'val-high':n>=1.4?'val-med':'val-low'; }
+
+// ── RENDER FREE ──
+function renderFree(rows) {
+  const tbody = document.getElementById('freeBody');
+  if (!rows.length) { tbody.innerHTML='<tr><td colspan="6"><div class="empty">לא נמצאו טיפים</div></td></tr>'; return; }
+  tbody.innerHTML = rows.map((r,i) => {
+    const cp = confPct(r.CONFIDENCE), cc = confColor(r.CONFIDENCE);
+    const parts = (r.MATCH||'').split(/\s*[-–]+\s*/);
+    const t1 = parts[0]||r.MATCH, t2 = parts[1]||'';
+    return `<tr style="animation-delay:${i*.04}s">
+      <td>
+        <div class="match-name">${t1}${t2?' — '+t2:''}</div>
+      </td>
+      <td>
+        <div class="datetime">${r.DATE||'–'}</div>
+        ${r.TIME?`<div class="time-tag">${r.TIME}</div>`:''}
+      </td>
+      <td><span class="pred ${predClass(r.PREDICTION)}">${predIcon(r.PREDICTION)} ${r.PREDICTION||'–'}</span></td>
+      <td>${r.OVER_UNDER?`<span class="pred ${ouClass(r.OVER_UNDER)}">${r.OVER_UNDER}</span>`:'<span style="color:var(--muted)">–</span>'}</td>
+      <td>
+        <div class="conf-wrap">
+          <div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${cp}%;background:${cc}"></div></div>
+          <span class="conf-pct" style="color:${cc}">${r.CONFIDENCE?Math.round(cp)+'%':'–'}</span>
+        </div>
+      </td>
+      <td><span class="val ${valClass(r.VALUE)}">${r.VALUE||'–'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── RENDER VIP ──
+function renderVip() {
+  const el = document.getElementById('vipCards');
+  if (!allVip.length) { el.innerHTML='<div class="empty">אין טיפי VIP להיום</div>'; return; }
+  el.innerHTML = allVip.map(r => `
+    <div class="vip-card">
+      <div class="vip-card-head">
+        <div class="vip-match">${r.MATCH||'–'}</div>
+        <div class="vip-time">${r.DATE||''} ${r.TIME?'⏰ '+r.TIME:''}</div>
+      </div>
+      <div class="vip-body">
+        <div class="vip-row">
+          <span class="vip-label">תוצאה מדויקת</span>
+          <span class="vip-val vip-score">${r.VIP_SCORE||'–'}</span>
+        </div>
+        <div class="vip-row">
+          <span class="vip-label">טופס יחס 10+</span>
+          <span class="vip-val" style="color:var(--green)">${r.VIP_FORM10||'–'}</span>
+        </div>
+        <div class="vip-row">
+          <span class="vip-label">טופס יחס 50+</span>
+          <span class="vip-val" style="color:var(--blue)">${r.VIP_FORM50||'–'}</span>
+        </div>
+        ${!vipUnlocked ? `
+        <div class="vip-blur">
+          <div class="vip-lock">🔒</div>
+          <button class="vip-unlock-btn" onclick="openVipModal()">רכוש גישה VIP</button>
+          <div class="vip-blur-text">קוד גישה נדרש</div>
+        </div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── TABS ──
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('freePanel').style.display = tab==='free'?'block':'none';
+  document.getElementById('vipPanel').classList.toggle('active', tab==='vip');
+}
+
+// ── FILTERS ──
+function filterBy(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function searchGames(val) { currentSearch=val; applyFilters(); }
+function applyFilters() {
+  let f = allFree;
+  if (currentFilter !== 'all') {
+    f = f.filter(r => {
+      const p = (r.PREDICTION||'').toLowerCase();
+      const ou = (r.OVER_UNDER||'').toLowerCase();
+      if (currentFilter==='over') return ou.includes('over');
+      if (currentFilter==='under') return ou.includes('under');
+      return p === currentFilter || p.includes(currentFilter);
+    });
+  }
+  if (currentSearch) f = f.filter(r => (r.MATCH||'').toLowerCase().includes(currentSearch.toLowerCase()));
+  renderFree(f);
+}
+
+// ── VIP MODAL ──
+function openVipModal() {
+  document.getElementById('vipModal').classList.add('open');
+  document.getElementById('vipCodeInput').focus();
+}
+function closeVipModal() {
+  document.getElementById('vipModal').classList.remove('open');
+  document.getElementById('vipErr').style.display='none';
+  document.getElementById('vipCodeInput').value='';
+}
+function checkVipCode() {
+  const code = document.getElementById('vipCodeInput').value.trim();
+  if (code === VIP_CODE) {
+    vipUnlocked = true;
+    sessionStorage.setItem('vipUnlocked','1');
+    closeVipModal();
+    renderVip();
+  } else {
+    document.getElementById('vipErr').style.display='block';
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('vipModal').classList.contains('open')) checkVipCode();
+  if (e.key==='Escape') closeVipModal();
+});
+
+loadData();
+</script>
+</body>
+</html>
